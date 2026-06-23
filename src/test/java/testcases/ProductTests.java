@@ -32,5 +32,39 @@ public class ProductTests extends BaseClass {
 				.body("size()",greaterThan(0));
 				
 		}
+		
+		//2) Test to retrieve a single product by ID
+		@Test
+		public void testGetSingleProductById()
+		{
+			int productId=configReader.getIntProperty("productId");
+			
+			given()
+				.pathParam("id", productId)
+			
+			.when()
+				.get(Routes.GET_PRODUCT_BY_ID)
+			.then()
+				.statusCode(200)
+				.log().body();
+		}
+		
+		//8) Test to add a new product
+		@Test
+		public void testAddNewProduct() {
+			ProductPOJO newProduct = Payload.productPayload();
 
-}
+			int productId = given().contentType(ContentType.JSON).body(newProduct)
+
+					.when().post(Routes.CREATE_PRODUCT)
+					.then()
+					.log().body().statusCode(201)
+					.body("id", notNullValue())
+					.body("title", equalTo(newProduct.getTitle()))
+					.extract().jsonPath().getInt("id"); // Extracting Id																// body
+
+			System.out.println(productId);
+
+		}
+
+	}
