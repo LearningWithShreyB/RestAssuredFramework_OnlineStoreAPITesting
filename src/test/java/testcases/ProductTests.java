@@ -3,17 +3,20 @@ package testcases;
 import pojo.ProductPOJO;
 import routes.Routes;
 import utils.ConfigReader;
+import utils.ExtentReporter;
 import io.restassured.http.ContentType;
 import io.restassured.response.Response;
 import payloads.Payload;
 
 import org.testng.ITestContext;
+import org.testng.annotations.Listeners;
 import org.testng.annotations.Test;
 import static io.restassured.RestAssured.given;
 import static org.hamcrest.Matchers.*;
 import static org.hamcrest.MatcherAssert.assertThat;
 import java.util.List;
 
+@Listeners(ExtentReporter.class)
 public class ProductTests extends BaseClass {
 	
 	//1) Test to retrieve all products
