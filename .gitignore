@@ -1,0 +1,13 @@
+# Target folder containing compiled code, temporary execution files, and reports
+/target/
+/test-output/
+/allure-results/
+/logs/
+/reports/
+
+# Eclipse specific files
+.settings/
+.project
+.classpath
+.metadata/
+*.log
