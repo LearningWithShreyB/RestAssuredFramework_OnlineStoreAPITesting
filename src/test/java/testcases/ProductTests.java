@@ -16,7 +16,7 @@ import static org.hamcrest.Matchers.*;
 import static org.hamcrest.MatcherAssert.assertThat;
 import java.util.List;
 
-@Listeners(ExtentReporter.class)
+//@Listeners(ExtentReporter.class)
 public class ProductTests extends BaseClass {
 
 	// 1) Test to retrieve all products
@@ -90,7 +90,7 @@ public class ProductTests extends BaseClass {
 	public void testAddNewProduct() {
 		ProductPOJO newProduct = Payload.productPayload();
 
-		int productId = given().contentType(ContentType.JSON).body(newProduct)
+		/*int productId =*/ given().contentType(ContentType.JSON).body(newProduct)
 
 				.when().post(Routes.CREATE_PRODUCT).then().statusCode(201).body("id", notNullValue())
 				.body("title", equalTo(newProduct.getTitle())).extract().jsonPath().getInt("id"); // Extracting Id //
