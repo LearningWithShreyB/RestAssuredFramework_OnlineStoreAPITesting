@@ -45,6 +45,21 @@ public class ProductTests extends BaseClass {
 
 				.when().get(Routes.GET_PRODUCTS_WITH_LIMIT).then().statusCode(200).body("size()", equalTo(4));
 	}
+	
+	//4) Test to sort the the product in Descending order
+	@Test
+	public void testGetDescendingSorted() {
+		Response response=given()
+		.pathParam("order","desc")
+		.when()
+		.get(Routes.GET_PRODUCTS_SORTED)
+		.then()
+		.statusCode(200)
+		.extract().response();
+		
+		List<Integer> productIds=response.jsonPath().getList("id",Integer.class);
+		assertThat(isSortedDescending(productIds),is(true));
+	}
 
 	// 8) Test to add a new product
 	@Test

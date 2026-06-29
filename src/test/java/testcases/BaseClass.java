@@ -1,14 +1,15 @@
 package testcases;
 
+import java.util.List;
+
 import org.testng.ITestResult;
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.AfterSuite;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.BeforeSuite;
+
 import io.restassured.RestAssured;
-import io.restassured.filter.log.RequestLoggingFilter;
-import io.restassured.filter.log.ResponseLoggingFilter;
 import routes.Routes;
 import utils.ConfigReader;
 import utils.LogManager;
@@ -34,44 +35,49 @@ public class BaseClass {
 		// Set up the target global URI context for RestAssured configuration
 		RestAssured.baseURI = Routes.BASE_URL;
 
-		// 🟢 NEW FIX: Custom filter that intercepts everything and writes it cleanly to executionHeaders.log
+		// 🟢 NEW FIX: Custom filter that intercepts everything and writes it cleanly to
+		// executionHeaders.log
 		RestAssured.filters((requestSpec, responseSpec, ctx) -> {
-			
+
 			StringBuilder logBuilder = new StringBuilder();
 			logBuilder.append("\n==================================================================\n");
-			logBuilder.append("API INTERACTION FOR TEST: ").append(requestSpec.getMethod()).append(" ").append(requestSpec.getURI()).append("\n");
+			logBuilder.append("API INTERACTION FOR TEST: ").append(requestSpec.getMethod()).append(" ")
+					.append(requestSpec.getURI()).append("\n");
 			logBuilder.append("==================================================================\n");
-			
+
 			// 1. Capture Request Headers
 			logBuilder.append("RequestHeaders:\n");
 			if (requestSpec.getHeaders() != null) {
-				requestSpec.getHeaders().forEach(header -> logBuilder.append("  ").append(header.getName()).append(": ").append(header.getValue()).append("\n"));
+				requestSpec.getHeaders().forEach(header -> logBuilder.append("  ").append(header.getName()).append(": ")
+						.append(header.getValue()).append("\n"));
 			}
-			
+
 			// Capture Request Body if it exists
 			if (requestSpec.getBody() != null) {
 				logBuilder.append("RequestBody:\n  ").append(requestSpec.getBody().toString()).append("\n");
 			}
-			
+
 			logBuilder.append("\n------------------------------------------------------------------\n");
-			
+
 			// Execute the actual request to get the response
 			io.restassured.response.Response response = ctx.next(requestSpec, responseSpec);
-			
+
 			// 2. Capture Response Headers
 			logBuilder.append("ResponseHeaders:\n");
 			if (response.getHeaders() != null) {
-				response.getHeaders().forEach(header -> logBuilder.append("  ").append(header.getName()).append(": ").append(header.getValue()).append("\n"));
+				response.getHeaders().forEach(header -> logBuilder.append("  ").append(header.getName()).append(": ")
+						.append(header.getValue()).append("\n"));
 			}
-			
+
 			// 3. Capture Response Body
 			logBuilder.append("\nResponseBody:\n");
 			logBuilder.append(response.getBody().asPrettyString()).append("\n");
 			logBuilder.append("==================================================================\n\n");
-			
-			// Write the built log directly to executionHeaders.log using our LogManager file utility
+
+			// Write the built log directly to executionHeaders.log using our LogManager
+			// file utility
 			LogManager.writeToHeadersLog(logBuilder.toString());
-			
+
 			return response;
 		});
 	}
@@ -104,5 +110,23 @@ public class BaseClass {
 		LogManager.log("==================================================");
 		LogManager.log("=== ALL SUITE EXECUTIONS COMPLETED SUCCESSFULLY ===");
 		LogManager.log("==================================================");
+	}
+
+	boolean isSortedDescending(List<Integer> list) {
+		for (int i = 0; i < list.size() - 1; i++) {
+			if (list.get(i) < list.get(i + 1)) {
+				return false;
+			}
+		}
+		return true;
+	}
+
+	boolean idSortedAscending(List<Integer> list) {
+		for (int i = 0; i < list.size() - 1; i++) {
+			if (list.get(i) > list.get(i + 1)) {
+				return false;
+			}
+		}
+		return true;
 	}
 }
