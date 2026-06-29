@@ -45,36 +45,45 @@ public class ProductTests extends BaseClass {
 
 				.when().get(Routes.GET_PRODUCTS_WITH_LIMIT).then().statusCode(200).body("size()", equalTo(4));
 	}
-	
-	//4) Test to sort the the product in Descending order
+
+	// 4) Test to sort the the product in Descending order
 	@Test
 	public void testGetDescendingSorted() {
-		Response response=given()
-		.pathParam("order","desc")
-		.when()
-		.get(Routes.GET_PRODUCTS_SORTED)
-		.then()
-		.statusCode(200)
-		.extract().response();
-		
-		List<Integer> productIds=response.jsonPath().getList("id",Integer.class);
-		assertThat(isSortedDescending(productIds),is(true));
-	}
-	
+		Response response = given().pathParam("order", "desc").when().get(Routes.GET_PRODUCTS_SORTED).then()
+				.statusCode(200).extract().response();
 
-	//5) Test to sort the the product in Ascending order
+		List<Integer> productIds = response.jsonPath().getList("id", Integer.class);
+		assertThat(isSortedDescending(productIds), is(true));
+	}
+
+	// 5) Test to sort the the product in Ascending order
 	@Test
 	public void testGetAscendingSorted() {
-		Response response=given()
-		.pathParam("order","asc")
-		.when()
-		.get(Routes.GET_PRODUCTS_SORTED)
-		.then()
-		.statusCode(200)
-		.extract().response();
-		
-		List<Integer> productIds=response.jsonPath().getList("id",Integer.class);
-		assertThat(isSortedAscending(productIds),is(true));
+		Response response = given().pathParam("order", "asc").when().get(Routes.GET_PRODUCTS_SORTED).then()
+				.statusCode(200).extract().response();
+
+		List<Integer> productIds = response.jsonPath().getList("id", Integer.class);
+		assertThat(isSortedAscending(productIds), is(true));
+	}
+
+	// 6) Test to get all product categories
+	@Test
+	public void testGetAllCategories() {
+		given()
+
+				.when().get(Routes.GET_ALL_CATEGORIES).then().statusCode(200).body("size()", greaterThan(0));
+
+	}
+
+	// 7) Test to get products by category
+
+	@Test
+	public void testGetProductsByCategory() {
+		given().pathParam("category", "electronics")
+        .when().get(Routes.GET_PRODUCTS_BY_CATEGORY)
+        .then().statusCode(200).body("size()", greaterThan(0))
+	    .body("category", everyItem(notNullValue())).body("category", everyItem(equalTo("electronics")));
+
 	}
 
 	// 8) Test to add a new product
