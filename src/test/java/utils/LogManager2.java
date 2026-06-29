@@ -6,37 +6,21 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import io.restassured.config.LogConfig;
+import io.restassured.config.RestAssuredConfig;
+import java.io.PrintStream;
+import java.io.FileOutputStream;
 
-public class LogManager {
+public class LogManager2 {
 
-	// 🟢 REMOVED 'final': Paths will now update dynamically per test execution run
-	private static String LOG_FILE_PATH = "logs/execution.log";
-	private static String HEADERS_LOG_PATH = "logs/executionHeaders.log";
+	private static final String LOG_FILE_PATH = "logs/execution.log";
+	private static final String HEADERS_LOG_PATH = "logs/executionHeaders.log";
 
 	public static void initLogs() {
-		// Generate a clean timestamp string for the filenames (e.g., 20260629_174523)
-		String fileTimestamp = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMdd_HHmmss"));
-
-		// 🟢 Update file paths dynamically for this specific execution run
-		LOG_FILE_PATH = "logs/execution_" + fileTimestamp + ".log";
-		HEADERS_LOG_PATH = "logs/executionHeaders_" + fileTimestamp + ".log";
-
-		// Initializes and wipes both uniquely named files cleanly
+		// Initializes and wipes both files cleanly
 		clearAndInitFile(LOG_FILE_PATH, "=== Test Execution Started ===");
 		clearAndInitFile(HEADERS_LOG_PATH, "=== API Traffic Log Started ===");
 	}
-	
-	/* Code to reverse if we want no time stamps for logs
-	 * public static void initLogs() {
-        // 🔙 REVERSION: Set paths back to the default static names
-        LOG_FILE_PATH = "logs/execution.log";
-        HEADERS_LOG_PATH = "logs/executionHeaders.log";
-
-        // Initializes and wipes both files cleanly
-        clearAndInitFile(LOG_FILE_PATH, "=== Test Execution Started ===");
-        clearAndInitFile(HEADERS_LOG_PATH, "=== API Traffic Log Started ===");
-    }
-	 */
 
 	private static void clearAndInitFile(String filePath, String headerMessage) {
 		try {
@@ -44,7 +28,7 @@ public class LogManager {
 			if (logFile.getParentFile() != null) {
 				logFile.getParentFile().mkdirs();
 			}
-			try (FileWriter fw = new FileWriter(logFile, false)) {
+			try (FileWriter fw = new FileWriter(logFile, false)) { // false overwrites old logs
 				fw.write(headerMessage + " at: " + getTimestamp() + "\n\n");
 			}
 		} catch (IOException e) {
@@ -60,15 +44,27 @@ public class LogManager {
 		}
 	}
 
+	public static RestAssuredConfig getRestAssuredHeaderLogConfig() {
+		try {
+			// Appends Rest Assured technical logs directly into executionHeaders.log
+			PrintStream fileOut = new PrintStream(new FileOutputStream(HEADERS_LOG_PATH, true));
+			return RestAssuredConfig.config().logConfig(LogConfig.logConfig().defaultStream(fileOut));
+		} catch (Exception e) {
+			System.err.println("Failed to setup RestAssured log redirection: " + e.getMessage());
+			return RestAssuredConfig.config();
+		}
+	}
+
+	private static String getTimestamp() {
+		return LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
+	}
+
+	// 🟢 NEW: Add this method to your LogManager class
 	public static void writeToHeadersLog(String logMessage) {
 		try (FileWriter fw = new FileWriter(HEADERS_LOG_PATH, true); PrintWriter pw = new PrintWriter(fw)) {
 			pw.println(logMessage);
 		} catch (IOException e) {
 			System.err.println("Failed to write to executionHeaders log file: " + e.getMessage());
 		}
-	}
-
-	private static String getTimestamp() {
-		return LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
 	}
 }
