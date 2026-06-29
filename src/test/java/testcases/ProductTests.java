@@ -70,8 +70,7 @@ public class ProductTests extends BaseClass {
 	@Test
 	public void testGetAllCategories() {
 		given()
-
-				.when().get(Routes.GET_ALL_CATEGORIES).then().statusCode(200).body("size()", greaterThan(0));
+	.when().get(Routes.GET_ALL_CATEGORIES).then().statusCode(200).body("size()", greaterThan(0));
 
 	}
 
@@ -97,8 +96,43 @@ public class ProductTests extends BaseClass {
 				.body("title", equalTo(newProduct.getTitle())).extract().jsonPath().getInt("id"); // Extracting Id //
 																									// body
 
-		System.out.println(productId);
+		//System.out.println(productId);
 
 	}
+	
+	//9) Test to update an existing product
+			@Test
+			public void testUpdateProduct()
+			{
+				int productId=configReader.getIntProperty("productId");
+				
+				ProductPOJO updatedPayload=Payload.productPayload();
+				
+				given()
+					.contentType(ContentType.JSON)
+					.body(updatedPayload)
+					.pathParam("id", productId)
+					
+				.when()
+					.put(Routes.UPDATE_PRODUCT)
+				.then()
+					.statusCode(200)
+					.body("title", equalTo(updatedPayload.getTitle()));
+					
+			}
+			
+			//10) test to delete a product
+			@Test
+			public void testDeleteProduct()
+			{
+				int productId=configReader.getIntProperty("productId");
+				
+				given()
+					.pathParam("id",productId)
+				.when()
+					.delete(Routes.DELETE_PRODUCT)
+				.then()
+					.statusCode(200);
+			}
 
 }
