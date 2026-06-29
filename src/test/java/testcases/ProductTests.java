@@ -60,6 +60,22 @@ public class ProductTests extends BaseClass {
 		List<Integer> productIds=response.jsonPath().getList("id",Integer.class);
 		assertThat(isSortedDescending(productIds),is(true));
 	}
+	
+
+	//5) Test to sort the the product in Ascending order
+	@Test
+	public void testGetAscendingSorted() {
+		Response response=given()
+		.pathParam("order","asc")
+		.when()
+		.get(Routes.GET_PRODUCTS_SORTED)
+		.then()
+		.statusCode(200)
+		.extract().response();
+		
+		List<Integer> productIds=response.jsonPath().getList("id",Integer.class);
+		assertThat(isSortedAscending(productIds),is(true));
+	}
 
 	// 8) Test to add a new product
 	@Test
